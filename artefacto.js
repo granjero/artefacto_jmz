@@ -27,6 +27,7 @@ function draw() {
   background(245);
 
   for (let circulo of circulos) {
+    circulo.seek();
     circulo.borde();
     circulo.update();
     circulo.show();
