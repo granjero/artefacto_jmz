@@ -107,6 +107,33 @@ cv2.imwrite('webcam_frame_contraste.jpg', adjusted)
 
 gray = cv2.cvtColor(cara, cv2.COLOR_RGB2GRAY)
 # calcular el tileGridSize segun el tamaño de cara
-clahe = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(8, 8))
+clahe = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(10, 12))
 enhanced = clahe.apply(gray)
 cv2.imwrite('webcam_frame_cara_gray.jpg', enhanced)
+
+########################################
+# codigo de gpt para imagen en canvas
+########################################
+# Target canvas size
+canvas_width, canvas_height = 1366, 768
+target_height = int(canvas_height * 0.9)  # 90% of canvas height
+
+# Resize the enhanced image maintaining aspect ratio
+h, w = enhanced.shape[:2]
+aspect_ratio = w / h
+resized_width = int(target_height * aspect_ratio)
+resized_enhanced = cv2.resize(enhanced, (resized_width, target_height), interpolation=cv2.INTER_AREA)
+
+# Create a white canvas
+canvas = np.ones((canvas_height, canvas_width), dtype=np.uint8) * 255
+
+# Compute top-left corner for centering
+x_offset = (canvas_width - resized_width) // 2
+y_offset = (canvas_height - target_height) // 2
+
+# Place the resized image in the center of the canvas
+canvas[y_offset:y_offset + target_height, x_offset:x_offset + resized_width] = resized_enhanced
+
+# Save the final image
+cv2.imwrite('cara.jpg', canvas)
+

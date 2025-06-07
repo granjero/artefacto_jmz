@@ -1,23 +1,18 @@
 let circulos = [];
+let circulosCara = [];
 
 let imagenCara = false;
 
 let lastLoadTime = 0;
 let loadInterval = 5000;
 
-const colores = [
-  [255, 61, 90],  
-  [255, 109, 31], 
-  [255, 183, 0],  
-  [0, 179, 170],  
-  [74, 0, 179]    
-];
+let leerCara = false;
 
 function setup() {
- createCanvas(windowWidth - 20, windowHeight - 20 );
-  for (let i = 0; i < 200; i++) {
-    let x = random(width);
-    let y = random(height);
+ createCanvas(1366, 768);
+  for (let i = 0; i < 310; i++) {
+    let x = round(random(width));
+    let y = round(random(height));
     circulos.push(new Circulo(x, y, i));
   }
 
@@ -38,20 +33,48 @@ function draw() {
     }
   }
 
-  
-//   if (millis() - lastLoadTime > loadInterval) {
-//     lastLoadTime = millis();
-//     console.log("log");
-//     console.log(Date.now());
-//
-//     recargaCara();
-//   }
-// }
-//
-// function recargaCara() {
-//     loadImage("webcam_frame_cara_gray.jpg?" + Date.now(), (archivo) => {
-//       image(archivo, 0, 0);
-//     });
-  // 
-// }
+
+
+
+  if (leerCara) {
+    leerCara = false; // prevent loading repeatedly
+    loadImage('cara.jpg', (imagenCara) => {
+      img = imagenCara;
+      circulosCara = new CirculosCara(img);
+      circulosCara = circulosCara.procesaImagen();
+
+
+      if(circulos.length < circulosCara.length) {
+        circulosCara = downsampleArray(circulosCara, circulos.length)
+      // let faltantes = circulosCara.length - circulos.length;
+      // console.log("resta: " + faltantes);
+      //   for(let i = 300; i < 300 + faltantes; i++) {
+      //     let x = round(random(width));
+      //     let y = round(random(height));
+      //     circulos.push(new Circulo(x, y, i));
+      //   }
+      }
+      
+    for (let circulo of circulos) {
+      circulo.seteaDestino(circulosCara[circulo.id]);
+    }
+
+      
+    });
+  }
+}
+
+function downsampleArray(originalArray, targetLength) {
+  if (targetLength >= originalArray.length) return originalArray; // No downsample needed
+  if (targetLength <= 0) return [];
+
+  const step = (originalArray.length - 1) / (targetLength - 1);
+  const downsampled = [];
+
+  for (let i = 0; i < targetLength; i++) {
+    const index = Math.round(i * step); // Nearest index to sample
+    downsampled.push(originalArray[index]);
+  }
+
+  return downsampled;
 }
