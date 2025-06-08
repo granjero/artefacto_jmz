@@ -1,6 +1,6 @@
 
 class CirculosCara {
-  constructor(img, maxBrightness = 85, espaciado = 3, maxRadio = 20) {
+  constructor(img, maxBrightness = 85, espaciado = 1, maxRadio = 20) {
     this.img = img;
     this.maxBrightness = maxBrightness;
     this.maxRadio = maxRadio;

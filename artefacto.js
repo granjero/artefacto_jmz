@@ -7,9 +7,10 @@ let lastLoadTime = 0;
 let loadInterval = 5000;
 
 let leerCara = false;
+let reset = false;
 
 function setup() {
- createCanvas(1366, 768);
+ createCanvas(1366, 768, WEBGL);
   for (let i = 0; i < 310; i++) {
     let x = round(random(width));
     let y = round(random(height));
@@ -34,11 +35,21 @@ function draw() {
   }
 
 
+  circulos[0].colorea();
+  circulos[10].colorea();
+  circulos[20].colorea();
+  circulos[30].colorea();
 
+  if(reset) {
+    reset = false;
+    for (let circulo of circulos) {
+        circulo.reset();
+    }
+  }
 
   if (leerCara) {
     leerCara = false; // prevent loading repeatedly
-    loadImage('cara.jpg', (imagenCara) => {
+    loadImage('cara.jpg?' + random(), (imagenCara) => {
       img = imagenCara;
       circulosCara = new CirculosCara(img);
       circulosCara = circulosCara.procesaImagen();
@@ -55,11 +66,9 @@ function draw() {
       //   }
       }
       
-    for (let circulo of circulos) {
-      circulo.seteaDestino(circulosCara[circulo.id]);
-    }
-
-      
+      for (let circulo of circulos) {
+        circulo.seteaDestino(circulosCara[circulo.id]);
+      }
     });
   }
 }

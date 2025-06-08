@@ -5,7 +5,7 @@ class Circulo {
     this.radio_destino = null;
     this.posicion = createVector(x, y);
     this.velocidad = p5.Vector.random2D();
-    this.velocidad.mult(random(0.5, 2));
+    this.velocidad.mult(random(0.3, 1));
     this.acceleracion = createVector(0, 0);
     this.radio =  floor(random(5, 30));
     this.masa = this.radio;
@@ -46,15 +46,15 @@ class Circulo {
     this.destino = null;
     this.radio_destino = null;
     this.velocidad = p5.Vector.random2D();
-    this.velocidad.mult(random(0.5, 2));
-    this.radio =  floor(random(5, 40));
-    this.masa = this.radio * 2;
+    this.velocidad.mult(random(0.3, 1));
+    // this.radio =  floor(random(5, 40));
+    // this.masa = this.radio * 2;
   }
 
   colorea() {
-    if(random() < 0.98) return;
+    if(random() < 0.9999) return;
     this.color = random(this.colores);
-    this.radio =  random(5, 40);
+    // this.radio =  random(5, 40);
   }
 
   buscaDestino() {
@@ -151,10 +151,6 @@ class Circulo {
     let sumaRadios = this.radio + otroCirculo.radio + 2;
     
     if (distancia > sumaRadios) return; // No collision
-
-    if(this.id == 0 && otroCirculo.id == 1) {
-      this.colorea();
-    }
 
     // Simplified collision response - just swap velocities
     let tempVel = this.velocidad.copy();

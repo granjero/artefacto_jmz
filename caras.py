@@ -14,8 +14,6 @@ if not webcam.isOpened():  # chequeo
     print('error al abrir la webcam')
     exit()
 
-# success, webcam_frame = webcam.read()
-# time.sleep(3)
 success, webcam_frame = webcam.read()
 webcam.release()
 cv2.imwrite('webcam_frame.jpg', webcam_frame)
@@ -24,7 +22,7 @@ if not success:  # otro chequeo
     print('error al capturar')
     exit()
 
-# obtiene imagen RGB de lo leido de la webcam
+# obtiene imagen BGR de lo leido de la webcam
 bgr_webcam_frame = cv2.cvtColor(webcam_frame, cv2.COLOR_BGR2RGB)
 cv2.imwrite('webcam_frame_bgr.jpg', bgr_webcam_frame)
 # transforma la imagen a mp format
@@ -69,15 +67,8 @@ with vision.ImageSegmenter.create_from_options(
     white_image[:] = (255, 255, 255)
 
     hair_mask = np.stack((confidence_masks[1].numpy_view(),) * 3, axis=-1) > 0.3
-    # body_skin_mask = np.stack((confidence_masks[2].numpy_view(),) * 3, axis=-1) > 0.3
     face_skin_mask = np.stack((confidence_masks[3].numpy_view(),) * 3, axis=-1) > 0.3
-
-    # selfie_mask = np.stack((category_mask.numpy_view(),) * 3, axis=-1) > 0.2
-
-    # skin_masks = np.logical_or(body_skin_mask, face_skin_mask)
-    # combined_masks = np.logical_or(skin_masks, hair_mask)
     combined_masks = np.logical_or(face_skin_mask, hair_mask)
-
 
     # encuentro los pixels extremos de la foto 
     pixels = combined_masks[:, :, 0]
@@ -91,25 +82,14 @@ with vision.ImageSegmenter.create_from_options(
     y2 = min(frame_height, np.max(y_coords) + padding)
 
     imagen_final = np.where(combined_masks, image_data, white_image)
-    cv2.imwrite('webcam_frame_selfie.jpg', imagen_final)
 
 cara = imagen_final[y1:y2, x1:x2]
-cv2.imwrite('webcam_frame_cara.jpg', cara)
-
-"""
-alpha = 1.5  # Contrast control
-beta = 0    # Brightness control
-
-# Apply the contrast and brightness adjustment
-adjusted = cv2.convertScaleAbs(cara, alpha=alpha, beta=beta)
-cv2.imwrite('webcam_frame_contraste.jpg', adjusted)
-"""
 
 gray = cv2.cvtColor(cara, cv2.COLOR_RGB2GRAY)
 # calcular el tileGridSize segun el tamaño de cara
 clahe = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(10, 12))
+
 enhanced = clahe.apply(gray)
-cv2.imwrite('webcam_frame_cara_gray.jpg', enhanced)
 
 ########################################
 # codigo de gpt para imagen en canvas
