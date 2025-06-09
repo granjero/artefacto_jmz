@@ -10,7 +10,8 @@ let leerCara = false;
 let reset = false;
 
 function setup() {
- createCanvas(1366, 768, WEBGL);
+  createCanvas(1366, 768, P2D);
+  frameRate(30)
   for (let i = 0; i < 310; i++) {
     let x = round(random(width));
     let y = round(random(height));
@@ -34,11 +35,10 @@ function draw() {
     }
   }
 
-
   circulos[0].colorea();
-  circulos[10].colorea();
-  circulos[20].colorea();
-  circulos[30].colorea();
+  circulos[99].colorea();
+  circulos[199].colorea();
+  circulos[299].colorea();
 
   if(reset) {
     reset = false;
@@ -57,13 +57,6 @@ function draw() {
 
       if(circulos.length < circulosCara.length) {
         circulosCara = downsampleArray(circulosCara, circulos.length)
-      // let faltantes = circulosCara.length - circulos.length;
-      // console.log("resta: " + faltantes);
-      //   for(let i = 300; i < 300 + faltantes; i++) {
-      //     let x = round(random(width));
-      //     let y = round(random(height));
-      //     circulos.push(new Circulo(x, y, i));
-      //   }
       }
       
       for (let circulo of circulos) {
