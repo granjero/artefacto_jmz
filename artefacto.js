@@ -8,7 +8,7 @@ let reset = false;
 let quadtree;
 
 function setup() {
-  createCanvas(1366, 768, P2D);
+  createCanvas(1343, 744, P2D);
   quadtree = new Quadtree({x: 0, y: 0, width: width, height: height });
   for (let i = 0; i < cantidad_de_circulos; i++) {
     let x = floor(random(width));
