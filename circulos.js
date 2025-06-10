@@ -3,23 +3,25 @@ class Circulo {
   constructor(x, y, id) {
     // propiedades para el circulo visual
     this.id = id;
+    this.color = [0, 0, 0];
+    this.colores = [
+      [255, 61, 90],
+      [255, 109, 31],
+      [255, 183, 0],
+      [0, 179, 170],
+      [74, 0, 179],
+      [209, 3, 99],
+      [26, 93, 26]
+    ];
+    this.desordena_array(this.colores);
     this.posicion = createVector(x, y);
     this.masa = this.radio;
     this.velocidad = p5.Vector.random2D();
     this.velocidad.mult(random(0.2, 1));
     this.aceleracion = createVector(0, 0);
     this.circulos_internos = random() > 0.995 ? true : false;
+    // this.circulos_internos_colores = this.desordena_array(this.colores);
     this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
-
-    this.color = [0, 0, 0];
-    this.colores = [
-      [0, 0, 0],
-      [255, 61, 90],
-      [255, 109, 31],
-      [255, 183, 0],
-      [0, 179, 170],
-      [74, 0, 179]
-    ];
 
     // cuando hay una cara
     this.posicion_en_cara = createVector(0, 0);
@@ -78,12 +80,12 @@ class Circulo {
     this.circulos_internos = random() > 0.995 ? true : false;
     this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
     this.radio_en_cara = null;
-    this.velocidad.set(random(-1,1), random(-1,1));
+    this.velocidad.set(random(-1.5,1.5), random(-1.5,1.5));
     this.velocidad.mult(random(0.2, 1));
   }
 
   show() {
-    stroke(this.color);
+    stroke(0);
     strokeWeight(2.5);
     circle(this.posicion.x, this.posicion.y, this.radio * 2);
     if(this.circulos_internos) this.circulos_internos_tres();
@@ -131,20 +133,42 @@ class Circulo {
 
   cambia_color() {
     let ids = [99, 199, 299];
-    if(ids.includes(this.id)) this.color = random(this.colores);
+    let colores = this.colores.concat([0,0,0]);
+    if(ids.includes(this.id)) this.color = random(colores);
   }
 
   circulos_internos_tres() {
+    stroke(this.colores[0]);
+    circle(this.posicion.x, this.posicion.y, this.radio * 2);
+    stroke(this.colores[1]);
     circle(this.posicion.x, this.posicion.y, this.radio * 1.5);
+    stroke(this.colores[2]);
     circle(this.posicion.x, this.posicion.y, this.radio);
+    stroke(this.colores[3]);
     circle(this.posicion.x, this.posicion.y, this.radio * 0.5);
+    stroke(0);
+  }
+
+  desordena_array(array) {
+    let currentIndex = array.length;
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+
+      // Pick a remaining element...
+      let randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
   }
 }
 
 
 
 class CaraDeCirculos {
-  constructor(img, brillo_maximo = 45, espaciado = 1, radio_maximo = 20) {
+  constructor(img, brillo_maximo = 155, espaciado = 1, radio_maximo = 20) {
     this.img = img;
     this.brillo_maximo = brillo_maximo;
     this.radio_maximo = radio_maximo;
@@ -183,5 +207,6 @@ class CaraDeCirculos {
     }
     return reducido;
   }
+
 
 }

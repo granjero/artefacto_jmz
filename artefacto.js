@@ -2,9 +2,13 @@ let cantidad_de_circulos = 300;
 let circulos = [];
 let cara_de_circulos = [];
 
-let leer_cara = false;
+let leer_cara = true;
+let leer_cara_start_time = 0;
+let cara_duracion = 1 * 60 * 1000; // 1 minutos
+let tiempo_buscar_nueva_cara = 15 * 1000; // 30 segundos 
 let chequear_colisiones = true;
 let reset = false;
+let esperando_reset = false;
 let quadtree;
 
 function setup() {
@@ -20,19 +24,6 @@ function setup() {
 function draw() {
   background(240);
 
-  if(leer_cara) {
-    leer_cara = false;
-    chequear_colisiones = false;
-    loadImage('cara.jpg?' + random(), (imagen_cara) => {
-      img = imagen_cara;
-      cara_de_circulos = new CaraDeCirculos(img);
-      cara_de_circulos = cara_de_circulos.procesa_imagen();
-
-      for (let circulo of circulos) {
-        circulo.setea_destino_cara(cara_de_circulos[circulo.id]);
-      }
-    });
-  }
 
   if(chequear_colisiones) {
     quadtree.clear(); // limpia el quadtree
@@ -67,6 +58,31 @@ function draw() {
     }
   }
 
+  if(leer_cara) {
+    leer_cara = false;
+    leer_cara_start_time = millis();
+    loadImage('cara.jpg?' + random(), 
+      (imagen_cara) => {
+        img = imagen_cara;
+        cara_de_circulos = new CaraDeCirculos(img);
+        cara_de_circulos = cara_de_circulos.procesa_imagen();
+
+        for (let circulo of circulos) {
+          circulo.setea_destino_cara(cara_de_circulos[circulo.id]);
+        }
+      chequear_colisiones = false;
+      esperando_reset = true;
+      tiempo_buscar_nueva_cara = 1 * 60 * 1000;
+      },
+      (errorEvent) => {
+        console.log(errorEvent);
+        leer_cara = false;
+        tiempo_buscar_nueva_cara = 15 * 1000;
+      }
+    );
+  }
+
+  // resetea los circulos luego de una cara exitosa
   if (reset) {
     reset = false;
     chequear_colisiones = true;
@@ -78,5 +94,13 @@ function draw() {
   for (let circulo of circulos) {
     circulo.update();
     circulo.show();
+  }
+
+  if (esperando_reset && millis() - leer_cara_start_time >= tiempo_buscar_nueva_cara) {
+    reset = true; // reset the flag after 5 minutes
+    esperando_reset = false;
+  }
+  if (millis() - leer_cara_start_time >= tiempo_buscar_nueva_cara) {
+    leer_cara = true; // reset the flag after 5 minutes
   }
 }
