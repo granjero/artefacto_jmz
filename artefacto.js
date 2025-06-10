@@ -1,6 +1,10 @@
-let circulos = [];
 let cantidad_de_circulos = 300;
+let circulos = [];
+let cara_de_circulos = [];
 
+let leer_cara = false;
+let chequear_colisiones = true;
+let reset = false;
 let quadtree;
 
 function setup() {
@@ -11,39 +15,63 @@ function setup() {
     let y = floor(random(height));
     circulos.push(new Circulo(x, y, i));
   }
-
 }
 
 function draw() {
   background(240);
-  quadtree.clear(); // limpia el quadtree
 
-  for (let circulo of circulos) { // rellena el quadtree
-    quadtree.insert(circulo.obtener_limites());
-  }
-  // chequea colisiones
-  for (let circulo of circulos) {
-    let candidatos = quadtree.retrieve(circulo.obtener_limites());
+  if(leer_cara) {
+    leer_cara = false;
+    chequear_colisiones = false;
+    loadImage('cara.jpg?' + random(), (imagen_cara) => {
+      img = imagen_cara;
+      cara_de_circulos = new CaraDeCirculos(img);
+      cara_de_circulos = cara_de_circulos.procesa_imagen();
 
-    for (let c of candidatos) {
-      let otro = c.ref;
-      if (otro !== circulo && circulo.colisiona_con_otro(otro)) {
-
-        let distancia = p5.Vector.dist(circulo.posicion, otro.posicion);
-        let suma_radios = circulo.radio + otro.radio + 2;
-
-        if( distancia < suma_radios ) {
-          let direccion = p5.Vector.sub(otro.posicion, circulo.posicion);
-          direccion.normalize();
-          let solapa = suma_radios - distancia;
-          circulo.posicion.sub(p5.Vector.mult(direccion, solapa/2));
-          otro.posicion.add(p5.Vector.mult(direccion, solapa/2));
-        }
-
-        let velocidad_temp = circulo.velocidad.copy();
-        circulo.velocidad = otro.velocidad.copy();
-        otro.velocidad = velocidad_temp;
+      for (let circulo of circulos) {
+        circulo.setea_destino_cara(cara_de_circulos[circulo.id]);
       }
+    });
+  }
+
+  if(chequear_colisiones) {
+    quadtree.clear(); // limpia el quadtree
+
+    for (let circulo of circulos) { // rellena el quadtree
+      quadtree.insert(circulo.obtener_limites());
+    }
+    // chequea colisiones
+    for (let circulo of circulos) {
+      let candidatos = quadtree.retrieve(circulo.obtener_limites());
+      // saca un circulo de candidatos.
+      for (let c of candidatos) {
+        let otro = c.ref;
+        if (otro !== circulo && otro.colisiona_con_otro(circulo)) {
+
+          let distancia = p5.Vector.dist(circulo.posicion, otro.posicion);
+          let suma_radios = circulo.radio + otro.radio + 2;
+
+          if( distancia < suma_radios ) {
+            let direccion = p5.Vector.sub(otro.posicion, circulo.posicion);
+            direccion.normalize();
+            let solapa = suma_radios - distancia;
+            circulo.posicion.sub(p5.Vector.mult(direccion, solapa/2));
+            otro.posicion.add(p5.Vector.mult(direccion, solapa/2));
+          }
+
+          let velocidad_temp = circulo.velocidad.copy();
+          circulo.velocidad = otro.velocidad.copy();
+          otro.velocidad = velocidad_temp;
+        }
+      }
+    }
+  }
+
+  if (reset) {
+    reset = false;
+    chequear_colisiones = true;
+    for (let circulo of circulos) {
+      circulo.reset();
     }
   }
   // actualiza los circulos y los muestra
