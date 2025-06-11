@@ -58,7 +58,7 @@ class Circulo {
       this.posicion.add(this.velocidad);
       this.rebota_borde();
     }
-    if(random() > 0.9999) this.cambia_color();
+    if(random() > 0.9966) this.cambia_color();
   }
 
   cambia_radio(r, r_d) {
@@ -85,7 +85,7 @@ class Circulo {
   }
 
   show() {
-    stroke(0);
+    stroke(this.color);
     strokeWeight(2.5);
     circle(this.posicion.x, this.posicion.y, this.radio * 2);
     if(this.circulos_internos) this.circulos_internos_tres();
