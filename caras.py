@@ -82,6 +82,7 @@ with vision.ImageSegmenter.create_from_options(
     y2 = min(frame_height, np.max(y_coords) + padding)
 
     imagen_final = np.where(combined_masks, image_data, white_image)
+    cv2.imwrite('cara.jpg', imagen_final)
 
 cara = imagen_final[y1:y2, x1:x2]
 
