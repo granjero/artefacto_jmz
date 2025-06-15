@@ -5,7 +5,7 @@ let cara_de_circulos = [];
 let leer_cara = true;
 let leer_cara_start_time = 0;
 let cara_duracion = 1 * 60 * 1000; // 1 minutos
-let tiempo_buscar_nueva_cara = 15 * 1000; // 30 segundos 
+let tiempo_buscar_nueva_cara = 15 * 1000; // 15 segundos 
 let chequear_colisiones = true;
 let reset = false;
 let esperando_reset = false;
@@ -40,6 +40,7 @@ function draw() {
         if (otro !== circulo && otro.colisiona_con_otro(circulo)) {
 
           let distancia = p5.Vector.dist(circulo.posicion, otro.posicion);
+          // TODO aura de repulsion a los que tienen circulos internos
           let suma_radios = circulo.radio + otro.radio + 2;
 
           if( distancia < suma_radios ) {
@@ -61,7 +62,7 @@ function draw() {
   if(leer_cara) {
     leer_cara = false;
     leer_cara_start_time = millis();
-    loadImage('cara.jpg?' + random(), 
+    loadImage('../cara.jpg?' + random(), 
       (imagen_cara) => {
         img = imagen_cara;
         cara_de_circulos = new CaraDeCirculos(img, 80);
@@ -97,10 +98,10 @@ function draw() {
   }
 
   if (esperando_reset && millis() - leer_cara_start_time >= tiempo_buscar_nueva_cara) {
-    reset = true; // reset the flag after 5 minutes
+    reset = true; 
     esperando_reset = false;
   }
   if (millis() - leer_cara_start_time >= tiempo_buscar_nueva_cara) {
-    leer_cara = true; // reset the flag after 5 minutes
+    leer_cara = true; 
   }
 }

@@ -18,7 +18,7 @@ class CarasWebcam:
 
         # inicializa el faceDetector
         detector_opciones_base = python.BaseOptions(
-            model_asset_path='detector.tflite')
+            model_asset_path='assets/detector.tflite')
         detector_opciones = vision.FaceDetectorOptions(
             base_options=detector_opciones_base)
         self.detector = vision.FaceDetector.create_from_options(
@@ -26,7 +26,7 @@ class CarasWebcam:
 
         # selfieSegmentator
         segmentador_opciones_base = python.BaseOptions(
-            model_asset_path='selfie_multiclass.tflite')
+            model_asset_path='assets/selfie_multiclass.tflite')
         segmentador_opciones = vision.ImageSegmenterOptions(
             base_options=segmentador_opciones_base,
             output_category_mask=True,
