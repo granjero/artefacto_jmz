@@ -64,7 +64,7 @@ function draw() {
     loadImage('cara.jpg?' + random(), 
       (imagen_cara) => {
         img = imagen_cara;
-        cara_de_circulos = new CaraDeCirculos(img);
+        cara_de_circulos = new CaraDeCirculos(img, 80);
         cara_de_circulos = cara_de_circulos.procesa_imagen();
 
         for (let circulo of circulos) {
