@@ -36,9 +36,6 @@ class CarasWebcam:
         self.segmentador = vision.ImageSegmenter.create_from_options(
             segmentador_opciones)
 
-    def guarda_imagen(self, imagen, nombre_archivo="sin_nombre.jpg"):
-        cv2.imwrite(nombre_archivo, imagen)
-
     def saca_foto(self):
         for i in range(30):  # tiro unas fotos hasta estabilizar la exposicion
             self.webcam.read()
@@ -83,7 +80,7 @@ class CarasWebcam:
             (mascara_confianza[1].numpy_view(),) * 3, axis=-1) > 0.3
         piel_cara_cabello = np.logical_or(piel_cara, cabello)
 
-        # guardo este self para tener para calcular el brillo promedio
+        # para tener para calcular el brillo promedio y el alto
         self.pixels_cara = piel_cara_cabello
 
         # encuentro los pixels extremos de la foto
@@ -101,12 +98,24 @@ class CarasWebcam:
             piel_cara_cabello, data_interna_imagen, imagen_en_blanco)
         return cara[y1:y2, x1:x2]
 
+    def alto_cara_suficiente(self, porcentaje=60):
+        limite = 100 / porcentaje
+        pixels = self.pixels_cara[:, :, 0]
+        y, x = np.where(pixels)
+        # (y2 - y1)
+        y_min, y_max = np.min(y), np.max(y)
+        alto_cara = y_max - y_min
+        alto = self.foto.shape[0]
+        
+        print(100 / (alto / alto_cara))
+
+        return alto / alto_cara < limite
+
     def proceso_calcula_brillo(self, imagen):
         # calculo brillo de la cara
         mascara = self.pixels_cara[:, :, 0]
         pixeles_cara = imagen[mascara]
         return np.mean(pixeles_cara)
-
 
     def proceso_byn(self, imagen):
         return cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
@@ -151,52 +160,36 @@ class CarasWebcam:
                x_offset:x_offset + nuevo_ancho] = nuevo_tamanio
         return canvas
 
-    # def procesos(self):
-    #     self.proceso_byn()
-    #     self.proceso_normaliza()
-    #     self.proceso_sharpen()
-    #     pass
+    def guarda_imagen(self, imagen, nombre_archivo="cara.jpg"):
+        cv2.imwrite(nombre_archivo, imagen)
+
+    def borra_imagen(self):
+        nombre_archivo = "cara.jpg"
+        try:
+            os.remove(nombre_archivo)
+            print(f"archivo borrado {nombre_archivo}")
+        except FileNotFoundError:
+            print(f"archivo no encontrado {nombre_archivo}")
+        except PermissionError:
+            print(f"error de permisos al borrar {nombre_archivo}")
+        except Exception as e:
+            print(f"error indefinido al borrar: {e}")
 
 
 webcam = CarasWebcam()
 webcam.saca_foto()
+
 if webcam.hay_cara_en_la_foto(webcam.foto):
     cara_recortada = webcam.recorta_cara(webcam.foto)
-    b_y_n = webcam.proceso_byn(cara_recortada)
-
-    sharpen = webcam.proceso_sharpen(b_y_n)
-    normalizada_desde_byn = webcam.proceso_normaliza(b_y_n)
-
-    normalizada_desde_sharpen = webcam.proceso_normaliza(sharpen)
-
-    clahe = webcam.proceso_clahe(normalizada_desde_sharpen)
-    webcam.guarda_imagen(webcam.imagen_final(clahe), "cara.jpg")
-
-    # webcam.guarda_imagen(webcam.imagen_final(b_y_n), "byn.jpg")
-    # webcam.guarda_imagen(webcam.imagen_final(sharpen), "sharp.jpg")
-    # webcam.guarda_imagen(webcam.imagen_final(normalizada_desde_sharpen), "normS.jpg")
-    # webcam.guarda_imagen(webcam.imagen_final(normalizada_desde_byn), "normBYN.jpg")
+    if webcam.alto_cara_suficiente(40):
+        b_y_n = webcam.proceso_byn(cara_recortada)
+        sharpen = webcam.proceso_sharpen(b_y_n)
+        # normalizada_desde_byn = webcam.proceso_normaliza(b_y_n)
+        normalizada_desde_sharpen = webcam.proceso_normaliza(sharpen)
+        clahe = webcam.proceso_clahe(normalizada_desde_sharpen)
+        webcam.guarda_imagen(webcam.imagen_final(clahe))
+        # webcam.guarda_imagen(webcam.foto, "foto.jpg")
+    else:
+        webcam.borra_imagen()
 else:
-    file = "cara.jpg"
-    try:
-        os.remove(file)
-        print(f"cara borrada {file}")
-    except FileNotFoundError:
-        print(f"cara no encontrada {file}")
-    except PermissionError:
-        print(f"error de permisos: {file}")
-    except Exception as e:
-        print(f"error indefinido al borrar: {e}")
-
-#
-# webcam.procesos()
-#
-# webcam.guarda_imagen(webcam.foto, "webcam.jpg")
-# webcam.guarda_imagen(webcam.cara_recortada, "cara_recortada.jpg")
-# webcam.guarda_imagen(webcam.normalizada, "norm.jpg")
-# webcam.guarda_imagen(webcam.blurred, "blurred.jpg")
-# webcam.guarda_imagen(webcam.bordes, "bordes.jpg")
-# webcam.guarda_imagen(webcam.sharpeneada, "sharp.jpg")
-# webcam.guarda_imagen(webcam.sharpeneada2, "sharp2.jpg")
-# webcam.guarda_imagen(webcam.imagen_final(), "cara.jpg")
-# print(webcam.brillo)
+    webcam.borra_imagen()
