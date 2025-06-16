@@ -3,7 +3,6 @@ class Circulo {
   constructor(x, y, id) {
     // propiedades para el circulo visual
     this.id = id;
-    this.color = [0, 0, 0];
     this.colores = [
       [255, 61, 90],
       [255, 109, 31],
@@ -19,20 +18,23 @@ class Circulo {
     this.velocidad = p5.Vector.random2D();
     this.velocidad.mult(random(0.2, 1));
     this.aceleracion = createVector(0, 0);
-    this.circulos_internos = random() > 0.995 ? true : false;
-    // this.circulos_internos_colores = this.desordena_array(this.colores);
+
+    this.ids_color_borde = [5, 180, 295]
+    this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
+
+    this.ids_circulos_internos = [50, 100, 150];
+    this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
+
     this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
 
     // cuando hay una cara
     this.posicion_en_cara = createVector(0, 0);
     this.radio_en_cara = null;
-    // this.direccion_hacia_posicion_en_cara = createVector(0, 0);
     this.distancia_arribado = 3; // a partir de cuando consideramos arribado.
     this.posicion_final_en_cara = false;
     this.velocidad_maxima = 0.85; // vel maxima cuando hay destino
     this.fuerza_maxima = 1 // fuerza para aplicar en seek
     this.direccion_hacia_posicion_en_cara = createVector(0, 0);
-    // this.direccionar = createVector(0, 0);
   }
 
   update() {
@@ -58,7 +60,7 @@ class Circulo {
       this.posicion.add(this.velocidad);
       this.rebota_borde();
     }
-    if(random() > 0.9966) this.cambia_color();
+    // if(random() > 0.9966) this.cambia_color();
   }
 
   cambia_radio(r, r_d) {
@@ -76,8 +78,9 @@ class Circulo {
   }
 
   reset() {
+    this.desordena_array(this.colores);
     this.posicion_en_cara.set(0, 0);
-    this.circulos_internos = random() > 0.995 ? true : false;
+    this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
     this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
     this.radio_en_cara = null;
     this.velocidad.set(random(-1.5,1.5), random(-1.5,1.5));
@@ -85,7 +88,7 @@ class Circulo {
   }
 
   show() {
-    stroke(this.color);
+    stroke(this.color_borde);
     strokeWeight(2.5);
     circle(this.posicion.x, this.posicion.y, this.radio * 2);
     if(this.circulos_internos) this.circulos_internos_tres();
@@ -134,7 +137,7 @@ class Circulo {
   cambia_color() {
     let ids = [99, 199, 299];
     let colores = this.colores.concat([0,0,0]);
-    if(ids.includes(this.id)) this.color = random(colores);
+    if(ids.includes(this.id)) this.color_borde = random(colores);
   }
 
   circulos_internos_tres() {
