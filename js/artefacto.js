@@ -86,10 +86,10 @@ function draw() {
   // resetea los circulos luego de una cara exitosa
   if (reset) {
     reset = false;
-    chequear_colisiones = true;
     for (let circulo of circulos) {
       circulo.reset();
     }
+    chequear_colisiones = true;
   }
   // actualiza los circulos y los muestra
   for (let circulo of circulos) {

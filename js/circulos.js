@@ -14,18 +14,22 @@ class Circulo {
     ];
     this.desordena_array(this.colores);
     this.posicion = createVector(x, y);
-    this.masa = this.radio;
     this.velocidad = p5.Vector.random2D();
     this.velocidad.mult(random(0.2, 1));
     this.aceleracion = createVector(0, 0);
 
-    this.ids_color_borde = [5, 180, 295]
+    this.ids_color_borde = [5, 131]
+    this.ids_circulos_internos = [47, 173, 215, 257];
+    this.ids_rellenos = [89]
+
     this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
-
-    this.ids_circulos_internos = [50, 100, 150];
     this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
+    this.relleno = this.ids_rellenos.includes(this.id) ? random(this.colores) : false
 
-    this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
+    this.radio = floor(random(5,30))
+    this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
+    this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
+    this.masa = this.radio;
 
     // cuando hay una cara
     this.posicion_en_cara = createVector(0, 0);
@@ -81,7 +85,11 @@ class Circulo {
     this.desordena_array(this.colores);
     this.posicion_en_cara.set(0, 0);
     this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
-    this.radio = this.circulos_internos ? floor(random(15, 30)) : floor(random(5,30));
+    this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
+    this.relleno = this.ids_rellenos.includes(this.id) ? random(this.colores) : false
+    this.radio = floor(random(5,30))
+    this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
+    this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
     this.radio_en_cara = null;
     this.velocidad.set(random(-1.5,1.5), random(-1.5,1.5));
     this.velocidad.mult(random(0.2, 1));
@@ -90,7 +98,13 @@ class Circulo {
   show() {
     stroke(this.color_borde);
     strokeWeight(2.5);
-    circle(this.posicion.x, this.posicion.y, this.radio * 2);
+    if(this.relleno){
+      fill(this.relleno);
+      circle(this.posicion.x, this.posicion.y, this.radio * 2);
+      fill(255);
+    } else {
+      circle(this.posicion.x, this.posicion.y, this.radio * 2);
+    }
     if(this.circulos_internos) this.circulos_internos_tres();
   }
 
