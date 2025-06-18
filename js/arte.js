@@ -3,14 +3,17 @@ let circulos = []; // array con los circulos
 let retrato = []; // array para el retrato
 
 let chocando = true;
-let mostrando_retrato_o_post_retrato = false;
-let leer_cara = false;
-let reset = false;
-let cara_leida_timestamp = 0;
-let reset_timestamp = 0;
-let intervalo_entre_lectura_caras = 1000 * 15;  // milisegundos * segundos = segundos
-let intervalo_reset = 1000 * 60 * 1; // milisegundos * segundos * minutos = minutos
-let intervalo_post_reset = 1000 * 60 * 2; // milisegundos * segundos * minutos = minutos
+let mostrando_retrato = false;
+let esperando_post_retrato = false;
+let buscando_foto = true;
+// let leer_cara = false;
+// let reset = false;
+let timestamp_archivo_leido = 0;
+let timestamp_reset = 0;
+let intervalo_mostrar_retrato = 1000 * 60 * 1;
+let intervalo_entre_lectura_archivo = 1000 * 15;  // milisegundos * segundos = segundos
+// let intervalo_reset = 1000 * 60 * 1; // milisegundos * 60 segundos * minutos = minutos
+let intervalo_post_retrato = 1000 * 60 * 1; // milisegundos * 60 segundos * minutos = minutos
 
 function setup() {
   createCanvas(1343, 744, P2D);
@@ -30,68 +33,65 @@ function draw() {
     circulo.show();
   }
 
-  if (chocando) {
-    chequea_colisiones(quadtree, circulos);
-  } else {
-    if (reset) {
-      reset_timestamp = millis();
-      console.log("reset");
-      reset = false;
-      for (let circulo of circulos) {
-        circulo.reset();
-      }
-      chocando = true;
+  if (chocando && buscando_foto) {
+     chequea_colisiones(quadtree, circulos);
+
+    if (tiempo_cumplido(timestamp_archivo_leido, intervalo_entre_lectura_archivo)) {
+      timestamp_archivo_leido = millis();
+
+      lee_imagen().then(
+        (imagen) => {
+          if (imagen) {
+            console.log("cara.jpg leido OK");
+            chocando = false;
+            buscando_foto = false;
+            mostrando_retrato = true;
+
+            // hace un objeto retrato con los datos de la imagen
+            retrato = new CaraDeCirculos(imagen, 80);
+            retrato = retrato.procesa_imagen();
+            // setea los destinos
+            for (let circulo of circulos) {
+              circulo.setea_destino_cara(retrato[circulo.id]);
+            }
+          } else {
+            console.log("no hay cara.jpg para leer");
+          }
+        }
+      );
     }
   }
 
+  if (mostrando_retrato) {
+    if (tiempo_cumplido(timestamp_archivo_leido, intervalo_mostrar_retrato)) {
+      mostrando_retrato = false;
+      buscando_foto = false;
+      chocando = true;
+      esperando_post_retrato = true;
 
-  if (leer_cara) {
-    leer_cara = false;
-    cara_leida_timestamp = millis();
-
-    encuentra_cara().then(
-      (imagen) => {
-        if (imagen) {
-          console.log("cara.jpg leido OK");
-          chocando = false;
-          mostrando_retrato_o_post_retrato = true;
-
-          retrato = new CaraDeCirculos(imagen, 80);
-          retrato = retrato.procesa_imagen();
-
-          for (let circulo of circulos) {
-            circulo.setea_destino_cara(retrato[circulo.id]);
-          }
-        } else {
-          console.log("no hay cara.jpg para leer");
-        }
+      for (let circulo of circulos) {
+        circulo.reset();
       }
-    );
+      timestamp_reset = millis();
+    }
+
   }
 
-  // si pasa el tiempo despues de reset
-  if (mostrando_retrato_o_post_retrato 
-    && (millis() - reset_timestamp >= intervalo_post_reset)) {
-    mostrando_retrato_o_post_retrato = false;
-    console.log("pasó el tiempo POST reset");
-  }
-
-  // si pasa el tiempo para mostrar el retrato
-  if (!chocando 
-    && (millis() - cara_leida_timestamp >= intervalo_reset)) {
-    reset = true;
-    console.log("pasó el tiempo para reset");
-  }
-
-  // si pasa el tiempo para leer caras
-  if (!mostrando_retrato_o_post_retrato 
-    && (millis() - cara_leida_timestamp >= intervalo_entre_lectura_caras)) {
-    leer_cara = true; 
-    console.log("paso el tiempo para volver a leer cara");
+  if (chocando && esperando_post_retrato) {
+    chequea_colisiones(quadtree, circulos);
+    if (tiempo_cumplido(timestamp_reset, intervalo_post_retrato)) {
+      buscando_foto = true;
+      esperando_post_retrato = false;
+      mostrando_retrato = false;
+    }
   }
 }
 
-function encuentra_cara() {
+function tiempo_cumplido(tiempo_inicio, intervalo) {
+  return (millis() - tiempo_inicio >= intervalo)
+}
+
+function lee_imagen() {
   return new Promise((resolve) => {
     loadImage('../cara.jpg?' + random(), 
       (img) => resolve(img), // success
