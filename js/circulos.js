@@ -29,7 +29,7 @@ class Circulo {
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
-    this.masa = this.radio;
+    this.masa = this.radio * 2;
 
     // cuando hay una cara
     this.posicion_en_cara = createVector(0, 0);
@@ -90,8 +90,9 @@ class Circulo {
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
+    this.masa = this.radio * 2;
     this.radio_en_cara = null;
-    this.velocidad.set(random(-1.5,1.5), random(-1.5,1.5));
+    this.velocidad.set(random(-1.0,1.0), random(-1.0,1.0));
     this.velocidad.mult(random(0.2, 1));
   }
 
