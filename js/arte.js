@@ -3,17 +3,19 @@ let circulos = []; // array con los circulos
 let retrato = []; // array para el retrato
 
 let chocando = true;
+let buscando_foto = true;
+let pegajoso = false;
 let mostrando_retrato = false;
 let esperando_post_retrato = false;
-let buscando_foto = true;
 // let leer_cara = false;
 // let reset = false;
 let timestamp_archivo_leido = 0;
 let timestamp_reset = 0;
+let timestamp_pegajoso = 0;
 let intervalo_mostrar_retrato = 1000 * 60 * 1;
 let intervalo_entre_lectura_archivo = 1000 * 15;  // milisegundos * segundos = segundos
 // let intervalo_reset = 1000 * 60 * 1; // milisegundos * 60 segundos * minutos = minutos
-let intervalo_post_retrato = 1000 * 60 * 1; // milisegundos * 60 segundos * minutos = minutos
+let intervalo_post_retrato = 1000 * 30 ; // milisegundos * 60 segundos * minutos = minutos
 
 function setup() {
   createCanvas(1343, 744, P2D);
@@ -66,9 +68,7 @@ function draw() {
     if (tiempo_cumplido(timestamp_archivo_leido, intervalo_mostrar_retrato)) {
       mostrando_retrato = false;
       buscando_foto = false;
-      chocando = true;
-      esperando_post_retrato = true;
-
+      pegajoso = true;
       for (let circulo of circulos) {
         circulo.reset();
       }
@@ -77,10 +77,22 @@ function draw() {
 
   }
 
-  if (chocando && esperando_post_retrato) {
+  if (pegajoso) {
     pegajosea(quadtree, circulos);
     if (tiempo_cumplido(timestamp_reset, intervalo_post_retrato)) {
+      timestamp_pegajoso = millis();
+      pegajoso = false;
+      // buscando_foto = true;
+      esperando_post_retrato = true;
+      // mostrando_retrato = false;
+    }
+  }
+
+  if (esperando_post_retrato) {
+    chequea_colisiones(quadtree, circulos);
+    if (tiempo_cumplido(timestamp_pegajoso, intervalo_post_retrato)) {
       buscando_foto = true;
+      chocando = true;
       esperando_post_retrato = false;
       mostrando_retrato = false;
     }
@@ -99,81 +111,6 @@ function lee_imagen() {
     );
   });
 }
-
-// function chequea_colisiones(quadtree, circulos) {
-//     quadtree.clear();
-//     // rellena el quadtree
-//     for (let circulo of circulos) { 
-//       quadtree.insert(circulo.obtener_limites());
-//     }
-//     // chequea colisiones
-//     for (let circulo of circulos) {
-//       let candidatos = quadtree.retrieve(circulo.obtener_limites());
-//
-//       let cx = circulo.posicion.x;
-//       let cy = circulo.posicion.y;
-//       let cr = circulo.radio;
-//       let cm = circulo.masa || (cr * cr); // default mass
-//
-//       for (let c of candidatos) {
-//         let otro = c.ref;
-//         if (otro === circulo) continue;
-//
-//         let ox = otro.posicion.x;
-//         let oy = otro.posicion.y;
-//         let or = otro.radio;
-//         let om = otro.masa || (or * or); // default mass
-//
-//         let dx = ox - cx;
-//         let dy = oy - cy;
-//         let dist2 = dx * dx + dy * dy;
-//
-//         let suma_radios = cr + or + 2;
-//         if (dist2 >= suma_radios * suma_radios) continue;
-//
-//         // √ Only here, and once
-//         let dist = Math.sqrt(dist2) || 0.0001;
-//         let nx = dx / dist;
-//         let ny = dy / dist;
-//
-//         // --- POSITION CORRECTION (anti-sticky) ---
-//         let solapamiento = suma_radios - dist;
-//         let totalMass = cm + om;
-//
-//         let separacion1 = (om / totalMass) * solapamiento;
-//         let separacion2 = (cm / totalMass) * solapamiento;
-//
-//         circulo.posicion.x -= nx * separacion1;
-//         circulo.posicion.y -= ny * separacion1;
-//         otro.posicion.x += nx * separacion2;
-//         otro.posicion.y += ny * separacion2;
-//
-//         // --- VELOCITY RESPONSE (Elastic Bounce) ---
-//         let rvx = circulo.velocidad.x - otro.velocidad.x;
-//         let rvy = circulo.velocidad.y - otro.velocidad.y;
-//
-//         // project relative velocity onto normal
-//         let velAlongNormal = rvx * nx + rvy * ny;
-//
-//         // Still allow impulse even if velAlongNormal > 0
-//         // to "unstick" bodies that are still touching
-//         let restitution = 1.0; // 1 = fully elastic
-//         let impulse = (-(1 + restitution) * velAlongNormal) / (1/cm + 1/om);
-//
-//         let impulseX = impulse * nx;
-//         let impulseY = impulse * ny;
-//
-//         circulo.velocidad.x += impulseX / cm;
-//         circulo.velocidad.y += impulseY / cm;
-//         otro.velocidad.x -= impulseX / om;
-//         otro.velocidad.y -= impulseY / om;
-//       }
-//   }
-//
-//
-//
-//
-// }
 
 function chequea_colisiones(quadtree, circulos) {
     quadtree.clear();
@@ -249,7 +186,7 @@ function pegajosea(quadtree, circulos) {
                     
                     // Position correction (more subtle)
                     let solapa = suma_radios - distancia;
-                    let correction = normal.copy().mult(solapa * 0.5);
+                    let correction = normal.copy().mult(solapa * 0.8);
                     circulo.posicion.sub(correction);
                     otro.posicion.add(correction);
                     
