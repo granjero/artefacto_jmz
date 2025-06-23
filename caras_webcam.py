@@ -37,9 +37,9 @@ class CarasWebcam:
             segmentador_opciones)
 
     def saca_foto(self):
-        for i in range(30):  # tiro unas fotos hasta estabilizar la exposicion
+        for i in range(10):  # tiro unas fotos hasta estabilizar la exposicion
             self.webcam.read()
-            time.sleep(0.1)
+            time.sleep(0.3)
 
         exito, foto = self.webcam.read()
         self.webcam.release()
@@ -47,7 +47,7 @@ class CarasWebcam:
         if not exito:
             raise RuntimeError("error al obtener un cuadro de la webcam")
 
-        self.foto = cv2.flip(foto, 1)  # cuadro de la webcam puro
+        self.foto = cv2.flip(foto, 1)  # cuadro de la webcam mirroreado
 
     def hay_cara_en_la_foto(self, imagen):  # true si hay caras false si no
         # convierte la imagen de BGR de la webcam a opencv RGB
@@ -106,7 +106,7 @@ class CarasWebcam:
         y_min, y_max = np.min(y), np.max(y)
         alto_cara = y_max - y_min
         alto = self.foto.shape[0]
-        
+
         print(100 / (alto / alto_cara))
 
         return alto / alto_cara < limite
@@ -133,7 +133,6 @@ class CarasWebcam:
         blurred = cv2.GaussianBlur(imagen, (0, 0), sigmaX=3.0)
         bordes = cv2.subtract(blurred, imagen)
         return cv2.addWeighted(imagen, 1.5, bordes, 0.7, 0)
-        # self.sharpeneada2 = self.normalizada + 1.5 * self.bordes  # Adjust weight (1.5) for stronger effect
 
     def proceso_clahe(self, imagen):
         clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(8, 8))
@@ -184,11 +183,9 @@ if webcam.hay_cara_en_la_foto(webcam.foto):
     if webcam.alto_cara_suficiente(40):
         b_y_n = webcam.proceso_byn(cara_recortada)
         sharpen = webcam.proceso_sharpen(b_y_n)
-        # normalizada_desde_byn = webcam.proceso_normaliza(b_y_n)
         normalizada_desde_sharpen = webcam.proceso_normaliza(sharpen)
         clahe = webcam.proceso_clahe(normalizada_desde_sharpen)
         webcam.guarda_imagen(webcam.imagen_final(clahe))
-        # webcam.guarda_imagen(webcam.foto, "foto.jpg")
     else:
         webcam.borra_imagen()
 else:
