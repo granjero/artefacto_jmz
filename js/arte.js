@@ -7,15 +7,12 @@ let buscando_foto = true;
 let pegajoso = false;
 let mostrando_retrato = false;
 let esperando_post_retrato = false;
-// let leer_cara = false;
-// let reset = false;
 let timestamp_archivo_leido = 0;
 let timestamp_reset = 0;
 let timestamp_pegajoso = 0;
-let intervalo_mostrar_retrato = 1000 * 60 * 1;
+let intervalo_mostrar_retrato = 1000 * 60 * 7;
 let intervalo_entre_lectura_archivo = 1000 * 15;  // milisegundos * segundos = segundos
-// let intervalo_reset = 1000 * 60 * 1; // milisegundos * 60 segundos * minutos = minutos
-let intervalo_post_retrato = 1000 * 30 ; // milisegundos * 60 segundos * minutos = minutos
+let intervalo_post_retrato = 1000 * 60 * 3 ; // milisegundos * 60 milisegundo * segundos = segundos
 
 function setup() {
   createCanvas(1343, 744, P2D);
@@ -69,6 +66,7 @@ function draw() {
       mostrando_retrato = false;
       buscando_foto = false;
       pegajoso = true;
+      // resetea los circulos
       for (let circulo of circulos) {
         circulo.reset();
       }
@@ -82,9 +80,7 @@ function draw() {
     if (tiempo_cumplido(timestamp_reset, intervalo_post_retrato)) {
       timestamp_pegajoso = millis();
       pegajoso = false;
-      // buscando_foto = true;
       esperando_post_retrato = true;
-      // mostrando_retrato = false;
     }
   }
 
