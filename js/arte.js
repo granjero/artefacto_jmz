@@ -7,15 +7,21 @@ let buscando_foto = true;
 let pegajoso = false;
 let mostrando_retrato = false;
 let esperando_post_retrato = false;
+
+let timestamp_inicio = 0;
 let timestamp_archivo_leido = 0;
 let timestamp_reset = 0;
 let timestamp_pegajoso = 0;
-let intervalo_mostrar_retrato = 1000 * 60 * 7;
-let intervalo_entre_lectura_archivo = 1000 * 15;  // milisegundos * segundos = segundos
-let intervalo_post_retrato = 1000 * 60 * 3 ; // milisegundos * 60 milisegundo * segundos = segundos
+
+let intervalo_mostrar_retrato = 1000 * 60 * 7;  // milisegundos * 60 * minutos = minutos
+let intervalo_entre_lectura_archivo = 1000 * 60 * 0.25;  // milisegundos * 60 * minutos = minutos 
+let intervalo_post_retrato = 1000 * 60 * 1 ; // milisegundos * 60 * minutos = minutos 
+let intervalo_pegajoso = 1000 * 60 * 0.5 ; // milisegundos * 60 * minutos = minutos 
 
 function setup() {
   createCanvas(1343, 744, P2D);
+  noSmooth();
+  timestamp_inicio = performance.now();
   quadtree = new Quadtree({x: 0, y: 0, width: width, height: height });
   for (let i = 0; i < cantidad_de_circulos; i++) {
     let x = floor(random(width));
@@ -36,7 +42,7 @@ function draw() {
      chequea_colisiones(quadtree, circulos);
 
     if (tiempo_cumplido(timestamp_archivo_leido, intervalo_entre_lectura_archivo)) {
-      timestamp_archivo_leido = millis();
+      timestamp_archivo_leido = performance.now();
 
       lee_imagen().then(
         (imagen) => {
@@ -70,15 +76,15 @@ function draw() {
       for (let circulo of circulos) {
         circulo.reset();
       }
-      timestamp_reset = millis();
+      timestamp_reset = performance.now();
     }
 
   }
 
   if (pegajoso) {
     pegajosea(quadtree, circulos);
-    if (tiempo_cumplido(timestamp_reset, intervalo_post_retrato)) {
-      timestamp_pegajoso = millis();
+    if (tiempo_cumplido(timestamp_reset, intervalo_pegajoso)) {
+      timestamp_pegajoso = performance.now();
       pegajoso = false;
       esperando_post_retrato = true;
     }
@@ -96,7 +102,7 @@ function draw() {
 }
 
 function tiempo_cumplido(tiempo_inicio, intervalo) {
-  return (millis() - tiempo_inicio >= intervalo)
+  return (performance.now() - tiempo_inicio >= intervalo)
 }
 
 function lee_imagen() {
