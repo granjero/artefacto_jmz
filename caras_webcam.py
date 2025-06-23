@@ -47,7 +47,7 @@ class CarasWebcam:
         if not exito:
             raise RuntimeError("error al obtener un cuadro de la webcam")
 
-        self.foto = foto  # cuadro de la webcam puro
+        self.foto = cv2.flip(foto, 1)  # cuadro de la webcam puro
 
     def hay_cara_en_la_foto(self, imagen):  # true si hay caras false si no
         # convierte la imagen de BGR de la webcam a opencv RGB
