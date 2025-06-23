@@ -186,7 +186,7 @@ class Circulo {
 
 
 class CaraDeCirculos {
-  constructor(img, brillo_maximo = 155, espaciado = 1, radio_maximo = 20) {
+  constructor(img, brillo_maximo = 125, espaciado = 1, radio_maximo = 20) {
     this.img = img;
     this.brillo_maximo = brillo_maximo;
     this.radio_maximo = radio_maximo;
