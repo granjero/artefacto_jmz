@@ -28,13 +28,13 @@ class Circulo {
     this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
     this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
     this.relleno = this.ids_rellenos.includes(this.id) ? random(this.colores) : false
-    this.cara_circular = this.ids_con_foto.includes(this.id) ? true : false;
 
     // radios depedientes 
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
-    this.radio = this.cara_circular ? 25 : this.radio;
+    this.radio = this.ids_con_foto.includes(this.id) ? 25 : this.radio;
+    this.color_borde = this.ids_con_foto.includes(this.id) ? 200 : this.color_borde;
     this.masa = this.radio * 2;
 
     // cuando hay una cara
@@ -96,7 +96,10 @@ class Circulo {
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
+    this.radio = this.ids_con_foto.includes(this.id) ? 25 : this.radio;
+    this.color_borde = this.ids_con_foto.includes(this.id) ? 200 : this.color_borde;
     this.masa = this.radio * 2;
+
     this.radio_en_cara = null;
     this.velocidad.set(random(-1.0,1.0), random(-1.0,1.0));
     this.velocidad.mult(random(0.2, 1));

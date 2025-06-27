@@ -1,4 +1,6 @@
 old/
+mediapipe_env/
 *.jpg
+*.png
 webcam*
 
