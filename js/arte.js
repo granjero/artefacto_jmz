@@ -47,7 +47,7 @@ function draw() {
   if (!mostrando_retrato) {
     if (cara_circulito) {
 
-     image(cara_circulito, circulos[150].posicion.x - circulos[150].radio, circulos[150].posicion.y - circulos[150].radio, circulos[150].radio * 2, circulos[150].radio * 2);
+     image(cara_circulito, circulos[150].posicion.x - 25, circulos[150].posicion.y - 25);
     }
   }
 
