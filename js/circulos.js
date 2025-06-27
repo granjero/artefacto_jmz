@@ -18,17 +18,23 @@ class Circulo {
     this.velocidad.mult(random(0.2, 1));
     this.aceleracion = createVector(0, 0);
 
-    this.ids_color_borde = [5, 131]
+    // ids para circulos distirntos
+    this.ids_color_borde = [5, 131];
     this.ids_circulos_internos = [47, 173, 215, 257];
-    this.ids_rellenos = [89]
+    this.ids_rellenos = [89];
+    this.ids_con_foto = [150];
 
+    // circulos diferentes a los demas
     this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
     this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
     this.relleno = this.ids_rellenos.includes(this.id) ? random(this.colores) : false
+    this.cara_circular = this.ids_con_foto.includes(this.id) ? true : false;
 
+    // radios depedientes 
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
+    this.radio = this.cara_circular ? 25 : this.radio;
     this.masa = this.radio * 2;
 
     // cuando hay una cara
@@ -168,15 +174,11 @@ class Circulo {
   }
 
   desordena_array(array) {
+    // implementacion de fisher yates shuffle
     let currentIndex = array.length;
-    // While there remain elements to shuffle...
     while (currentIndex != 0) {
-
-      // Pick a remaining element...
       let randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
-
-      // And swap it with the current element.
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
     }

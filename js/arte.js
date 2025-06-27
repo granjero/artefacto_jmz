@@ -1,6 +1,7 @@
 let cantidad_de_circulos = 300; // circulos en pantalla
 let circulos = []; // array con los circulos
 let retrato = []; // array para el retrato
+let cara_circulito = null;
 
 let chocando = true;
 let buscando_foto = true;
@@ -18,9 +19,14 @@ let intervalo_entre_lectura_archivo = 1000 * 60 * 0.25;  // milisegundos * 60 * 
 let intervalo_post_retrato = 1000 * 60 * 1 ; // milisegundos * 60 * minutos = minutos 
 let intervalo_pegajoso = 1000 * 60 * 0.5 ; // milisegundos * 60 * minutos = minutos 
 
+// function preload() {
+//   cara_circular = loadImage('/test.png');
+// }
+
 function setup() {
   createCanvas(1343, 744, P2D);
   noSmooth();
+  tint(255, 100);
   timestamp_inicio = performance.now();
   quadtree = new Quadtree({x: 0, y: 0, width: width, height: height });
   for (let i = 0; i < cantidad_de_circulos; i++) {
@@ -38,13 +44,20 @@ function draw() {
     circulo.show();
   }
 
+  if (!mostrando_retrato) {
+    if (cara_circulito) {
+
+     image(cara_circulito, circulos[150].posicion.x - circulos[150].radio, circulos[150].posicion.y - circulos[150].radio, circulos[150].radio * 2, circulos[150].radio * 2);
+    }
+  }
+
   if (chocando && buscando_foto) {
      chequea_colisiones(quadtree, circulos);
 
     if (tiempo_cumplido(timestamp_archivo_leido, intervalo_entre_lectura_archivo)) {
       timestamp_archivo_leido = performance.now();
 
-      lee_imagen().then(
+      lee_imagen('../cara.jpg').then(
         (imagen) => {
           if (imagen) {
             console.log("cara.jpg leido OK");
@@ -61,6 +74,17 @@ function draw() {
             }
           } else {
             console.log("no hay cara.jpg para leer");
+          }
+        }
+      );
+
+      lee_imagen('../cara_circulito.png').then(
+        (imagen) => {
+          if (imagen) {
+            cara_circulito = imagen;
+            console.log("cara_circulito.png leido OK");
+          } else {
+            console.log("no hay cara_circulito.png para leer");
           }
         }
       );
@@ -105,9 +129,9 @@ function tiempo_cumplido(tiempo_inicio, intervalo) {
   return (performance.now() - tiempo_inicio >= intervalo)
 }
 
-function lee_imagen() {
+function lee_imagen(path) {
   return new Promise((resolve) => {
-    loadImage('../cara.jpg?' + random(), 
+    loadImage(path + "?" + random(), 
       (img) => resolve(img), // success
       (err) => resolve(false) // failure
     );

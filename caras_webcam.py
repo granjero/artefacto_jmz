@@ -138,6 +138,25 @@ class CarasWebcam:
         clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(8, 8))
         return clahe.apply(imagen)
 
+    def proceso_circulo(self, imagen):
+        h, w = imagen.shape[:2]
+        recorte_top = (h - w) // 2
+        recorte_bottom = recorte_top + w
+        imagen_recortada = imagen[recorte_top:recorte_bottom, 0:w]
+        imagen_recortada = cv2.resize(imagen_recortada, (50, 50), interpolation=cv2.INTER_AREA)
+        # le agrego un canal alfa a la imagen
+        imagen_recortada = cv2.cvtColor(imagen_recortada, cv2.COLOR_GRAY2BGRA)
+        hr, wr = imagen_recortada.shape[:2]
+
+        mascara = np.zeros((hr, wr), dtype=np.uint8)
+        centro = (wr // 2, wr // 2)
+        radio = wr // 2
+        cv2.circle(mascara, centro, radio, 255, -1)
+        imagen_recortada[:, :, 3] = cv2.bitwise_and(
+            imagen_recortada[:, :, 3], mascara)
+
+        return imagen_recortada
+
     def imagen_final(self, imagen):
         ancho_lienzo, alto_lienzo = 1343, 744
         # tamaño de la cara
@@ -185,7 +204,9 @@ if webcam.hay_cara_en_la_foto(webcam.foto):
         sharpen = webcam.proceso_sharpen(b_y_n)
         normalizada_desde_sharpen = webcam.proceso_normaliza(sharpen)
         clahe = webcam.proceso_clahe(normalizada_desde_sharpen)
+        cara_circular = webcam.proceso_circulo(clahe)
         webcam.guarda_imagen(webcam.imagen_final(clahe))
+        webcam.guarda_imagen(cara_circular, "cara_circulito.png")
     else:
         webcam.borra_imagen()
 else:
