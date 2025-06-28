@@ -19,10 +19,6 @@ let intervalo_entre_lectura_archivo = 1000 * 60 * 0.25;  // milisegundos * 60 * 
 let intervalo_post_retrato = 1000 * 60 * 1 ; // milisegundos * 60 * minutos = minutos 
 let intervalo_pegajoso = 1000 * 60 * 0.5 ; // milisegundos * 60 * minutos = minutos 
 
-// function preload() {
-//   cara_circular = loadImage('/test.png');
-// }
-
 function setup() {
   createCanvas(1343, 744, P2D);
   noSmooth();
@@ -46,8 +42,7 @@ function draw() {
 
   if (!mostrando_retrato) {
     if (cara_circulito) {
-
-     image(cara_circulito, circulos[150].posicion.x - 25, circulos[150].posicion.y - 25);
+      image(cara_circulito, circulos[150].posicion.x - 25, circulos[150].posicion.y - 25);
     }
   }
 
