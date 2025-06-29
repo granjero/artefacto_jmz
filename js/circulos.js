@@ -82,7 +82,7 @@ class Circulo {
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
-    this.radio = this.ids_con_foto.includes(this.id) ? 30 : this.radio;
+    this.radio = this.ids_con_foto.includes(this.id) ? 27 : this.radio;
     this.color_borde = this.ids_con_foto.includes(this.id) ? 100 : this.color_borde;
     this.masa = this.radio * 2;
 
