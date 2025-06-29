@@ -2,6 +2,7 @@ let cantidad_de_circulos = 300; // circulos en pantalla
 let circulos = []; // array con los circulos
 let retrato = []; // array para el retrato
 let cara_circulito = null;
+let radio_cara_circulito = 0;
 
 let chocando = true;
 let buscando_foto = true;
@@ -21,7 +22,8 @@ let intervalo_pegajoso = 1000 * 60 * 0.5 ; // milisegundos * 60 * minutos = minu
 
 function setup() {
   createCanvas(1343, 744, P2D);
-  noSmooth();
+  // noSmooth();
+  smooth();
   tint(255, 100);
   timestamp_inicio = performance.now();
   quadtree = new Quadtree({x: 0, y: 0, width: width, height: height });
@@ -38,12 +40,6 @@ function draw() {
   for (let circulo of circulos) {  // actualiza los circulos y los muestra
     circulo.update();
     circulo.show();
-  }
-
-  if (!mostrando_retrato) {
-    if (cara_circulito) {
-      image(cara_circulito, circulos[150].posicion.x - 25, circulos[150].posicion.y - 25);
-    }
   }
 
   if (chocando && buscando_foto) {
@@ -77,6 +73,7 @@ function draw() {
         (imagen) => {
           if (imagen) {
             cara_circulito = imagen;
+            radio_cara_circulito = imagen.width / 2;
             console.log("cara_circulito.png leido OK");
           } else {
             console.log("no hay cara_circulito.png para leer");
@@ -118,6 +115,14 @@ function draw() {
       mostrando_retrato = false;
     }
   }
+
+  if (!mostrando_retrato && cara_circulito) {
+    let x = circulos[150].posicion.x - radio_cara_circulito;
+    let y = circulos[150].posicion.y - radio_cara_circulito;
+
+    image(cara_circulito, x, y);
+  }
+
 }
 
 function tiempo_cumplido(tiempo_inicio, intervalo) {
