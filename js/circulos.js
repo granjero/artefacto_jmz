@@ -1,6 +1,7 @@
 class Circulo {
 
   constructor(x, y, id) {
+
     // propiedades para el circulo visual
     this.id = id;
     this.colores = [
@@ -12,10 +13,8 @@ class Circulo {
       [209, 3, 99],
       [26, 93, 26]
     ];
-    this.desordena_array(this.colores);
     this.posicion = createVector(x, y);
-    this.velocidad = p5.Vector.random2D();
-    this.velocidad.mult(random(0.2, 1));
+    this.velocidad = createVector(x, y);
     this.aceleracion = createVector(0, 0);
 
     // ids para circulos distirntos
@@ -24,27 +23,14 @@ class Circulo {
     this.ids_rellenos = [89];
     this.ids_con_foto = [150];
 
-    // circulos diferentes a los demas
-    this.color_borde = this.ids_color_borde.includes(this.id) ? random(this.colores) : [0, 0, 0];
-    this.circulos_internos = this.ids_circulos_internos.includes(this.id) ? true :false;
-    this.relleno = this.ids_rellenos.includes(this.id) ? random(this.colores) : false
-
-    // radios depedientes 
-    this.radio = floor(random(5,30))
-    this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
-    this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
-    this.radio = this.ids_con_foto.includes(this.id) ? 25 : this.radio;
-    this.color_borde = this.ids_con_foto.includes(this.id) ? 100 : this.color_borde;
-    this.masa = this.radio * 2;
-
-    // cuando hay una cara
     this.posicion_en_cara = createVector(0, 0);
-    this.radio_en_cara = null;
     this.distancia_arribado = 3; // a partir de cuando consideramos arribado.
     this.posicion_final_en_cara = false;
     this.velocidad_maxima = 0.85; // vel maxima cuando hay destino
     this.fuerza_maxima = 1 // fuerza para aplicar en seek
     this.direccion_hacia_posicion_en_cara = createVector(0, 0);
+
+    this.reset();
   }
 
   update() {
@@ -96,8 +82,8 @@ class Circulo {
     this.radio = floor(random(5,30))
     this.radio = this.ids_circulos_internos.includes(this.id) ? floor(random(15, 30)) : this.radio;
     this.radio = this.ids_rellenos.includes(this.id) ? floor(random(5, 9)) : this.radio;
-    this.radio = this.ids_con_foto.includes(this.id) ? 25 : this.radio;
-    this.color_borde = this.ids_con_foto.includes(this.id) ? 200 : this.color_borde;
+    this.radio = this.ids_con_foto.includes(this.id) ? 30 : this.radio;
+    this.color_borde = this.ids_con_foto.includes(this.id) ? 100 : this.color_borde;
     this.masa = this.radio * 2;
 
     this.radio_en_cara = null;
